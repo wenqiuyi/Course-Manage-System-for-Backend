@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coursemanage.module.teacher.mapper.TeacherMapper">
+    <resultMap id="TeacherMap" type="com.coursemanage.module.teacher.pojo.Teacher">
+        <id property="id" column="id"/>
+        <result property="avaUrl" column="ava_url"/>
+        <result property="name" column="name"/>
+        <result property="teacherNo" column="teacher_no"/>
+        <result property="gender" column="gender"/>
+    </resultMap>
+
+    <select id="getAllTeachers" resultMap="TeacherMap">
+        SELECT id, ava_url, name, teacher_no, gender FROM teacher
+    </select>
+
+    <select id="getByTeacherNo" parameterType="string" resultMap="TeacherMap">
+        SELECT id, ava_url, name, teacher_no, gender FROM teacher WHERE teacher_no = #{teacherNo}
+    </select>
+</mapper>

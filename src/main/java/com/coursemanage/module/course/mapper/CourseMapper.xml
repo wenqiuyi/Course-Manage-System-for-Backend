@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coursemanage.module.course.mapper.CourseMapper">
+    <resultMap id="CourseMap" type="com.coursemanage.module.course.pojo.Course">
+        <id property="id" column="id"/>
+        <result property="classId" column="class_id"/>
+        <result property="name" column="name"/>
+        <result property="description" column="description"/>
+        <result property="commentArea" column="comment_area"/>
+        <result property="acaYear" column="aca_year"/>
+        <result property="semester" column="semester"/>
+        <result property="teacherNo" column="teacher_no"/>
+    </resultMap>
+
+    <select id="getCoursesByFilter" resultMap="CourseMap" parameterType="map">
+        SELECT id, class_id, name, description, comment_area, aca_year, semester, teacher_no
+        FROM course
+        WHERE 1=1
+        <if test="teacherNo != null and teacherNo != ''">
+            AND teacher_no = #{teacherNo}
+        </if>
+        <if test="acaYear != null and acaYear != ''">
+            AND aca_year = #{acaYear}
+        </if>
+        <if test="semester != null and semester != ''">
+            AND semester = #{semester}
+        </if>
+    </select>
+
+    <select id="getCourseById" parameterType="int" resultMap="CourseMap">
+        SELECT id, class_id, name, description, comment_area, aca_year, semester, teacher_no
+        FROM course WHERE id = #{id}
+    </select>
+</mapper>

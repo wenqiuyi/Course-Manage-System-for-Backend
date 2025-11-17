@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coursemanage.module.courseclass.mapper.CourseClassMapper">
+    <resultMap id="CourseClassMap" type="com.coursemanage.module.courseclass.pojo.CourseClass">
+        <id property="id" column="id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="className" column="class_name"/>
+        <result property="teacherNo" column="teacher_no"/>
+        <result property="studentCount" column="student_count"/>
+    </resultMap>
+
+    <insert id="insertCourseClass" parameterType="com.coursemanage.module.courseclass.pojo.CourseClass" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course_class(course_id, class_name, teacher_no)
+        VALUES(#{courseId}, #{className}, #{teacherNo})
+    </insert>
+
+    <!-- 插入班级-学生关联，参数 map 包含 class_id 和 student_no -->
+    <insert id="insertClassStudent" parameterType="map">
+        INSERT INTO class_student(class_id, student_no) VALUES(#{classId}, #{studentNo})
+    </insert>
+
+    <select id="getCourseClasses" parameterType="map" resultMap="CourseClassMap">
+        SELECT cc.id, cc.course_id, cc.class_name, cc.teacher_no, COUNT(cs.student_no) AS student_count
+        FROM course_class cc
+        LEFT JOIN class_student cs ON cc.id = cs.class_id
+        WHERE 1=1
+        <if test="courseId != null"> AND cc.course_id = #{courseId} </if>
+        <if test="teacherNo != null and teacherNo != ''"> AND cc.teacher_no = #{teacherNo} </if>
+        GROUP BY cc.id, cc.course_id, cc.class_name, cc.teacher_no
+    </select>
+
+    <select id="getCourseClassById" parameterType="int" resultMap="CourseClassMap">
+        SELECT id, course_id, class_name, teacher_no, (SELECT COUNT(*) FROM class_student cs WHERE cs.class_id = course_class.id) as student_count
+        FROM course_class WHERE id = #{id}
+    </select>
+
+    <update id="updateCourseClass" parameterType="map">
+        UPDATE course_class
+        <set>
+            <if test="className != null"> class_name = #{className},</if>
+            <if test="teacherNo != null"> teacher_no = #{teacherNo},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteCourseClass" parameterType="int">
+        DELETE FROM course_class WHERE id = #{id}
+    </delete>
+    <select id="getStudentsByClassId" parameterType="int" resultType="com.coursemanage.module.student.pojo.Student">
+        SELECT s.id, s.ava_url AS avaUrl, s.name, s.student_no AS studentNo,
+        s.gender, s.role_type AS roleType, s.department, s.major
+        FROM student s
+        INNER JOIN class_student cs ON s.student_no = cs.student_no
+        WHERE cs.class_id = #{classId}
+    </select>
+    <delete id="deleteClassStudentsByClassId" parameterType="int">
+    DELETE FROM class_student WHERE class_id = #{classId}
+</delete>
+
+
+</mapper>

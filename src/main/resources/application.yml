@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: TokenDemo
+  datasource:
+    url: jdbc:mysql://193.112.246.119:3306/gwsj
+    username: gwsj
+    password: gwsjgwsj
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  # 保留 JPA 配置（默认即可，如需 JPA 自动建表可添加 spring.jpa.hibernate.ddl-auto: update）
+  # jpa:
+  #   hibernate:
+  #     ddl-auto: update  # 按需开启，JPA 自动建表
+  jackson:
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    time-zone: GMT+8
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 9999
+
+logging:
+  level:
+    org.springframework.security: DEBUG
