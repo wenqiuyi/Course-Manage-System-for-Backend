@@ -1,9 +1,7 @@
 package com.coursemanage.module.accountmanage.controller;
 
 import com.coursemanage.module.accountmanage.pojo.Account;
-import com.coursemanage.module.accountmanage.pojo.ExcelAccount;
 import com.coursemanage.module.accountmanage.service.AccountService;
-import com.coursemanage.module.accountmanage.util.EasyExcelUtil;
 import com.coursemanage.pojo.ResponseResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,9 +14,8 @@ import java.util.List;
 @RequestMapping("/api/admin")
 @PreAuthorize("hasAuthority('manager')")
 @RequiredArgsConstructor
-public class AccountController {
+public class AdminAccountController {
     private final AccountService accountService;
-    private final EasyExcelUtil easyExcelUtil;
     @GetMapping("/users")
     public List<Account> getUsers(){
         return accountService.getUsers();

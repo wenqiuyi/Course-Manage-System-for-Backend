@@ -12,6 +12,8 @@ public interface AccountMapper {
     List<Account> selectAll();
     @Select("select * from user where id = #{id}")
     Account selectById(Long id);
+    @Select("select * from user where school_num = #{schoolNum}")
+    Account selectBySchoolNum(String schoolNum);
     @Insert("insert into user (school_num, password, role, phone, email, status) " +
             "values (#{schoolNum}, #{password}, #{role}, #{phone}, #{email}, #{status})")
     @Options(useGeneratedKeys = true, keyColumn = "id", keyProperty = "id")

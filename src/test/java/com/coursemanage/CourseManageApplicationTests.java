@@ -7,4 +7,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootTest
 class CourseManageApplicationTests {
+    @Test
+    void contextLoads() {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        System.out.println(bCryptPasswordEncoder.encode("10002"));
+    }
 }

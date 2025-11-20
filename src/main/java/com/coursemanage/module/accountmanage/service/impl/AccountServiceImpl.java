@@ -67,7 +67,12 @@ public class AccountServiceImpl implements AccountService {
                     Account account = new Account();
                     account.setSchoolNum(excelAccount.getSchoolNum());
                     account.setPassword(encodedPassword);
-                    account.setRole(excelAccount.getRole());
+                    switch (excelAccount.getRole()) {
+                        case "学生" -> account.setRole("student");
+                        case "教师", "老师" -> account.setRole("teacher");
+                        case "管理员" -> account.setRole("manager");
+                        default -> account.setRole("unknown");
+                    }
                     account.setPhone(excelAccount.getPhone());
                     account.setEmail(excelAccount.getEmail());
                     account.setStatus(excelAccount.getStatus().equals("启用") ? 1 : 0);
@@ -103,5 +108,15 @@ public class AccountServiceImpl implements AccountService {
         } catch (Exception e) {
             return ResponseResult.error(400, "导入数据失败: " + e.getMessage());
         }
+    }
+
+    @Override
+    public Account selectById(Long id) {
+        return accountMapper.selectById(id);
+    }
+
+    @Override
+    public Account selectBySchoolNum(String schoolNum) {
+        return accountMapper.selectBySchoolNum(schoolNum);
     }
 }

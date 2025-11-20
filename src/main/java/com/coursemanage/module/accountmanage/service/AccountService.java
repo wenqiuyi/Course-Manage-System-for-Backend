@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface AccountService {
     List<Account> getUsers();
+    Account selectById(Long id);
+    Account selectBySchoolNum(String schoolNum);
     ResponseResult<Void> createUser(Account account);
     ResponseResult<Void> updateUser(Account account);
     ResponseResult<Void> resetUserPassword(Long id);
