@@ -11,17 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @ExcelIgnoreUnannotated
-public class Account {
-    // id
-    @JsonProperty("id")
-    private Long id;
+public class ExcelAccount {
     // 用户学工号
     @JsonProperty("school_num")
     @ExcelProperty("学工号")
     private String schoolNum;
-    // 密码
-    @JsonProperty("password")
-    private String password;
     // 角色
     @JsonProperty("role")
     @ExcelProperty("角色类型")
@@ -37,5 +31,5 @@ public class Account {
     // 是否启用 0-不启用 1-启用
     @JsonProperty("status")
     @ExcelProperty("状态")
-    private Integer status;
+    private String status;
 }

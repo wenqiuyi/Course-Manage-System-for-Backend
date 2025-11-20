@@ -1,11 +1,14 @@
 package com.coursemanage.module.accountmanage.controller;
 
 import com.coursemanage.module.accountmanage.pojo.Account;
+import com.coursemanage.module.accountmanage.pojo.ExcelAccount;
 import com.coursemanage.module.accountmanage.service.AccountService;
+import com.coursemanage.module.accountmanage.util.EasyExcelUtil;
 import com.coursemanage.pojo.ResponseResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountService accountService;
+    private final EasyExcelUtil easyExcelUtil;
     @GetMapping("/users")
     public List<Account> getUsers(){
         return accountService.getUsers();
@@ -36,8 +40,8 @@ public class AccountController {
     public ResponseResult<Void> createUser(Account account){
         return accountService.createUser(account);
     }
-    @PostMapping("/importUsers")
-    public ResponseResult<Void> importUsers(List<Account> accounts){
-        return ResponseResult.success();
+    @PostMapping("/excel/test")
+    public ResponseResult<Void> uploadExcel(@RequestParam("file") MultipartFile file){
+        return accountService.importUsers(file);
     }
 }
