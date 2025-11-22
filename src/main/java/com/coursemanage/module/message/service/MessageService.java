@@ -15,5 +15,7 @@ public interface MessageService extends IService<Message> {
 
     int getUnreadCount(String receiverNo);
 
+    MessageVO getMessageById(Integer id, String receiverNo);
+
     void batchMarkAsRead(List<Integer> messageIds); // List<Integer>类型
 }

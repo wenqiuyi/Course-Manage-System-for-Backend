@@ -140,6 +140,27 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     }
 
     @Override
+    public MessageVO getMessageById(Integer id, String receiverNo) {
+        LambdaQueryWrapper<Message> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Message::getId, id)
+                .eq(Message::getReceiverNo, receiverNo);
+
+        Message message = this.getOne(queryWrapper);
+        if (message == null) {
+            return null;
+        }
+
+        // 如果消息未读，自动标记为已读
+        if ("未读".equals(message.getStatus())) {
+            this.markAsRead(id);
+        }
+
+        MessageVO vo = new MessageVO();
+        BeanUtils.copyProperties(message, vo);
+        return vo;
+    }
+
+    @Override
     @Transactional
     public void batchMarkAsRead(List<Integer> messageIds) {
         if (messageIds != null && !messageIds.isEmpty()) {

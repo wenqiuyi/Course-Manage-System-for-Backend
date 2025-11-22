@@ -47,6 +47,19 @@ public class MessageController {
         }
     }
 
+    @GetMapping("/list/read/{id}")
+    public ApiResponse<MessageVO> getMessageDetail(@PathVariable Integer id) {
+        try {
+            String receiverNo = getCurrentUserNo();
+            MessageVO message = messageService.getMessageById(id, receiverNo);
+            if (message == null) {
+                return ApiResponse.error(404, "消息不存在或无权查看");
+            }
+            return ApiResponse.success(message);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
     /**
      * 获取收件箱消息
      */
