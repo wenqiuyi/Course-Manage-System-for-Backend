@@ -19,4 +19,18 @@ public class TeacherController {
     public ApiResponse<List<Teacher>> getAllTeachers() {
         return ApiResponse.success(teacherService.getAllTeachers());
     }
+    //根据学号获取教师
+    @GetMapping("/{teacherNo}")
+    public ApiResponse<Teacher> getTeacherByNo(@PathVariable String teacherNo) {
+        if (teacherNo == null || teacherNo.trim().isEmpty()) {
+            return ApiResponse.fail(404,"教师号不能为空");
+        }
+
+        Teacher teacher= teacherService.getTeacherByNo(teacherNo.trim());
+        if (teacher != null) {
+            return ApiResponse.success(teacher);
+        } else {
+            return ApiResponse.fail(404, "未找到教师号为[" + teacherNo + "]的教师");
+        }
+    }
 }
