@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface AccountMapper {
+public interface AccountMapper{
     @Select("select * from user")
     List<Account> selectAll();
     @Select("select * from user where id = #{id}")

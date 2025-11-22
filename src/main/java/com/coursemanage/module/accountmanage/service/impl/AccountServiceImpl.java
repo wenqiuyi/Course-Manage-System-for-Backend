@@ -6,6 +6,10 @@ import com.coursemanage.module.accountmanage.pojo.ExcelAccount;
 import com.coursemanage.module.accountmanage.service.AccountService;
 import com.coursemanage.module.accountmanage.util.EasyExcelUtil;
 import com.coursemanage.module.log.annotation.LogOperation;
+import com.coursemanage.module.student.mapper.StudentMapper;
+import com.coursemanage.module.student.pojo.Student;
+import com.coursemanage.module.teacher.mapper.TeacherMapper;
+import com.coursemanage.module.teacher.pojo.Teacher;
 import com.coursemanage.pojo.ResponseResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -20,6 +24,8 @@ import java.util.stream.Collectors;
 public class AccountServiceImpl implements AccountService {
     private static final String DEFAULT_PASSWORD = "123456";
     private final AccountMapper accountMapper;
+    private final StudentMapper studentMapper;
+    private final TeacherMapper teacherMapper;
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
     private final EasyExcelUtil easyExcelUtil;
     @Override
@@ -35,14 +41,14 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public ResponseResult<Void> createUser(Account account) {
-        String encodedPassword = encoder.encode(account.getPassword());
-        account.setPassword(encodedPassword);
+        account.setPassword(encoder.encode(account.getPassword()));
         int count = accountMapper.insert(account);
         return count == 1 ? ResponseResult.success() : ResponseResult.error();
     }
 
     @Override
     public ResponseResult<Void> updateUser(Account account) {
+        account.setPassword(encoder.encode(account.getPassword()));
         int count = accountMapper.update(account);
         return count == 1 ? ResponseResult.success() : ResponseResult.error();
     }
@@ -80,6 +86,42 @@ public class AccountServiceImpl implements AccountService {
                 }).collect(Collectors.toList());
     }
 
+    private List<Student> convertFromExcelAccountsToStudents(List<ExcelAccount> excelAccounts) {
+        return excelAccounts.stream()
+                .filter(excelAccount -> excelAccount.getRole().equals("学生"))
+                .map(excelAccount -> {
+                    Student student = new Student();
+                    student.setAvaUrl(null);
+                    student.setName(excelAccount.getName());
+                    switch (excelAccount.getGender()) {
+                        case "男" -> student.setGender("M");
+                        case "女" -> student.setGender("F");
+                        default -> student.setGender("U");
+                    }
+                    student.setStudentNo(excelAccount.getSchoolNum());
+                    student.setDepartment(excelAccount.getDepartment());
+                    student.setMajor(excelAccount.getMajor());
+                    student.setRoleType("student");
+                    return student;
+                }).collect(Collectors.toList());
+    }
+    private List<Teacher> convertFromExcelAccountsToTeachers(List<ExcelAccount> excelAccounts) {
+        return excelAccounts.stream()
+                .filter(excelAccount -> excelAccount.getRole().equals("学生"))
+                .map(excelAccount -> {
+                    Teacher teacher = new Teacher();
+                    teacher.setAvaUrl(null);
+                    teacher.setName(excelAccount.getName());
+                    switch (excelAccount.getGender()) {
+                        case "男" -> teacher.setGender("M");
+                        case "女" -> teacher.setGender("F");
+                        default -> teacher.setGender("U");
+                    }
+                    teacher.setTeacherNo(excelAccount.getSchoolNum());
+                    return teacher;
+                }).collect(Collectors.toList());
+    }
+
     @Override
     public ResponseResult<Void> importUsers(MultipartFile file) {
         if (file.isEmpty()) {
@@ -103,6 +145,13 @@ public class AccountServiceImpl implements AccountService {
                 if (insertCount == 1) {
                     count++;
                 }
+            }
+            List<Student> students = convertFromExcelAccountsToStudents(users);
+            for(Student student : students){
+                studentMapper.insertStudent(student);
+            }
+            List<Teacher> teachers = convertFromExcelAccountsToTeachers(users);
+            for(Teacher teacher : teachers){
             }
             return ResponseResult.success(200, "成功导入" + count + "条数据");
         } catch (Exception e) {
