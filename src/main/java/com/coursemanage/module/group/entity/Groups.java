@@ -8,7 +8,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("groups")  // 绑定数据库表名
+@TableName("group_info")  // 绑定数据库表名
 public class Groups {
     @TableId(type = IdType.AUTO)  // 主键自增
     private Integer id;
