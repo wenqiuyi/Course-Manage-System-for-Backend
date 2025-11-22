@@ -16,4 +16,5 @@ public class Teacher {
     private String name;
     private String teacherNo;
     private String gender;
+    private String department;
 }
