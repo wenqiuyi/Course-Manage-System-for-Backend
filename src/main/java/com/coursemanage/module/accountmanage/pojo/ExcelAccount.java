@@ -16,10 +16,26 @@ public class ExcelAccount {
     @JsonProperty("school_num")
     @ExcelProperty("学工号")
     private String schoolNum;
+    // 姓名
+    @JsonProperty("name")
+    @ExcelProperty("姓名")
+    private String name;
+    // 性别
+    @JsonProperty("gender")
+    @ExcelProperty("性别")
+    private String gender;
     // 角色
     @JsonProperty("role")
     @ExcelProperty("角色类型")
     private String role;
+    // 院系
+    @JsonProperty("department")
+    @ExcelProperty("院系")
+    private String department;
+    // 专业
+    @JsonProperty("major")
+    @ExcelProperty("专业")
+    private String major;
     // 手机号
     @JsonProperty("phone")
     @ExcelProperty("手机号")
