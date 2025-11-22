@@ -19,4 +19,18 @@ public class StudentController {
     public ApiResponse<List<Student>> getAllStudents() {
         return ApiResponse.success(studentService.getAllStudents());
     }
+
+    //根据学号获取学生
+    @GetMapping("/{studentNo}")
+    public ApiResponse<Student> getStudentByNo(@PathVariable String studentNo) {
+        if (studentNo == null || studentNo.trim().isEmpty()) {
+            return ApiResponse.fail(404,"学号不能为空");
+        }
+        Student student = studentService.getStudentByNo(studentNo.trim());
+        if (student != null) {
+            return ApiResponse.success(student);
+        } else {
+            return ApiResponse.fail(404, "未找到学号为[" + studentNo + "]的学生");
+        }
+    }
 }
