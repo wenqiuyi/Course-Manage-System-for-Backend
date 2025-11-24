@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -110,17 +111,44 @@ public class CheckinService {
         QueryWrapper<CheckinRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("checkin_id", checkinId);
         List<CheckinRecord> records = checkinRecordMapper.selectList(queryWrapper);
+        return records.stream()
+                .map(this::buildRecordVO)
+                .collect(Collectors.toList());
+    }
 
-        return records.stream().map(record -> {
-            CheckinRecordVO vo = new CheckinRecordVO();
-            BeanUtils.copyProperties(record, vo);
+    /**
+     * 根据课程ID获取所有签到记录
+     */
+    public List<CheckinRecordVO> getCheckinRecordsByCourseId(Integer courseId) {
+        Course course = courseMapper.selectById(courseId);
+        if (course == null) {
+            throw new RuntimeException("课程不存在");
+        }
 
-            // 根据student_no查找学生信息
-            // 注意：这里需要根据实际的Student实体类来获取学生姓名
-            // 暂时使用student_no作为显示名称
-            vo.setStudentName(record.getStudentNo());
+        QueryWrapper<Checkin> checkinQuery = new QueryWrapper<>();
+        checkinQuery.eq("course_id", courseId);
+        List<Checkin> checkins = checkinMapper.selectList(checkinQuery);
+        if (checkins == null || checkins.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-            return vo;
-        }).collect(Collectors.toList());
+        List<Integer> checkinIds = checkins.stream()
+                .map(Checkin::getId)
+                .collect(Collectors.toList());
+
+        QueryWrapper<CheckinRecord> recordQuery = new QueryWrapper<>();
+        recordQuery.in("checkin_id", checkinIds);
+        List<CheckinRecord> records = checkinRecordMapper.selectList(recordQuery);
+        return records.stream()
+                .map(this::buildRecordVO)
+                .collect(Collectors.toList());
+    }
+
+    private CheckinRecordVO buildRecordVO(CheckinRecord record) {
+        CheckinRecordVO vo = new CheckinRecordVO();
+        BeanUtils.copyProperties(record, vo);
+        // TODO: replace with actual student name lookup when available
+        vo.setStudentName(record.getStudentNo());
+        return vo;
     }
 }
