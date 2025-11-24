@@ -35,4 +35,9 @@ public class AnnouncementDataController {
     public List<AnnouncementEntity> announcementList(){
         return announcementService.showAll();
     }
+    @PostMapping("/delete")
+    @PreAuthorize("hasAnyAuthority('manager', 'teacher')")
+    public ResponseResult<Void> announcementDelete(@RequestBody Long id){
+        return announcementService.deleteOne(id);
+    }
 }

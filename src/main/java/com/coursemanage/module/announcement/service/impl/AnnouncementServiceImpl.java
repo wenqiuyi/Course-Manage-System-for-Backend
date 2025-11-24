@@ -1,6 +1,7 @@
 package com.coursemanage.module.announcement.service.impl;
 
 import com.coursemanage.module.announcement.mapper.AnnouncementMapper;
+import com.coursemanage.module.log.annotation.LogOperation;
 import com.coursemanage.module.log.mapper.LogMapper;
 import com.coursemanage.module.announcement.pojo.AnnouncementEntity;
 import com.coursemanage.module.log.pojo.LogEntity;
@@ -81,5 +82,20 @@ public class AnnouncementServiceImpl implements AnnouncementService {
             return updateOne(announcementEntity);
         }
         return ResponseResult.error();
+    }
+
+    @Override
+    @LogOperation(
+            module = "announcement",
+            action = "delete",
+            detailOnSuccess = "删除了一条公告"
+    )
+    public ResponseResult<Void> deleteOne(Long id) {
+        int result = announcementMapper.deleteById(id);
+        if(result == 1){
+            return ResponseResult.success();
+        }else{
+            return ResponseResult.error();
+        }
     }
 }
