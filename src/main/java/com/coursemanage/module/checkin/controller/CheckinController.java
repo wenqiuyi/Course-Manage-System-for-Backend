@@ -73,6 +73,21 @@ public class CheckinController {
             return ApiResponse.error(e.getMessage());
         }
     }
+
+    /**
+     * 根据课程ID获取签到记录
+     * GET /api/sign/course-records?courseId=xxx
+     */
+    @GetMapping("/course-records")
+    public ApiResponse<List<CheckinRecordVO>> getCourseCheckinRecords(
+            @RequestParam Integer courseId) {
+        try {
+            List<CheckinRecordVO> records = checkinService.getCheckinRecordsByCourseId(courseId);
+            return ApiResponse.success(records);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
 }
 
 
