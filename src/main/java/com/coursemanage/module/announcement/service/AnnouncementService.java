@@ -11,4 +11,5 @@ public interface AnnouncementService {
     ResponseResult<Map<String, Object>> addOne(AnnouncementEntity announcementEntity);
     ResponseResult<Map<String, Object>> updateOne(AnnouncementEntity announcementEntity);
     ResponseResult<Map<String, Object>> updateStatus(Long id, String status);
+    ResponseResult<Void> deleteOne(Long id);
 }

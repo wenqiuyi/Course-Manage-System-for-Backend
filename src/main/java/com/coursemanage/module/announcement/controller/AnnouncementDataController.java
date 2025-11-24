@@ -35,4 +35,9 @@ public class AnnouncementDataController {
     public List<AnnouncementEntity> announcementList(){
         return announcementService.showAll();
     }
+    @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('manager', 'teacher')")
+    public ResponseResult<Void> announcementDelete(@PathVariable Long id){
+        return announcementService.deleteOne(id);
+    }
 }
