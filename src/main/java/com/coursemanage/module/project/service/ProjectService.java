@@ -1,15 +1,19 @@
 package com.coursemanage.module.project.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.coursemanage.module.courseclass.mapper.CourseClassMapper;
 import com.coursemanage.module.project.dto.ProjectCreateRequest;
 import com.coursemanage.module.project.dto.ProjectScoreRequest;
 import com.coursemanage.module.project.dto.ProjectStatsVO;
 import com.coursemanage.module.project.dto.ProjectSubmitRequest;
+import com.coursemanage.module.project.dto.ProjectUpdateRequest;
 import com.coursemanage.module.project.dto.ProjectVO;
+import com.coursemanage.module.project.dto.StudentProjectSubmissionVO;
 import com.coursemanage.module.project.entity.ProjectPractice;
 import com.coursemanage.module.project.entity.ProjectSubmission;
 import com.coursemanage.module.project.mapper.ProjectPracticeMapper;
 import com.coursemanage.module.project.mapper.ProjectSubmissionMapper;
+import com.coursemanage.module.student.pojo.Student;
 import com.coursemanage.pojo.entity.Course;
 import com.coursemanage.pojo.mapper.CourseEntityMapper;
 import org.springframework.beans.BeanUtils;
@@ -18,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +39,9 @@ public class ProjectService {
 
     @Autowired
     private CourseEntityMapper courseMapper;
+
+    @Autowired
+    private CourseClassMapper courseClassMapper;
 
     /**
      * 教师发布项目
@@ -65,6 +75,41 @@ public class ProjectService {
     }
 
     /**
+     * 教师修改项目
+     */
+    @Transactional
+    public ProjectPractice updateProject(ProjectUpdateRequest request, String teacherPersonNo) {
+        // 验证项目是否存在
+        ProjectPractice project = projectMapper.selectById(request.getId());
+        if (project == null) {
+            throw new RuntimeException("项目不存在");
+        }
+
+        // 验证教师权限
+        Course course = courseMapper.selectById(project.getCourseId());
+        if (course == null) {
+            throw new RuntimeException("课程不存在");
+        }
+        if (course.getTeacherNo() == null || !course.getTeacherNo().equals(teacherPersonNo)) {
+            throw new RuntimeException("无权限操作此项目");
+        }
+
+        // 验证时间
+        if (request.getStartTime().isAfter(request.getEndTime())) {
+            throw new RuntimeException("开始时间不能晚于结束时间");
+        }
+
+        // 更新项目信息
+        project.setTitle(request.getTitle());
+        project.setDescription(request.getDescription());
+        project.setStartTime(request.getStartTime());
+        project.setEndTime(request.getEndTime());
+
+        projectMapper.updateById(project);
+        return project;
+    }
+
+    /**
      * 获取项目列表
      */
     public List<ProjectVO> getProjectList(Integer courseId) {
@@ -75,6 +120,43 @@ public class ProjectService {
         return projects.stream().map(project -> {
             ProjectVO vo = new ProjectVO();
             BeanUtils.copyProperties(project, vo);
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询学生已提交的项目列表
+     */
+    public List<StudentProjectSubmissionVO> getStudentSubmittedProjects(String studentNo) {
+        QueryWrapper<ProjectSubmission> submissionWrapper = new QueryWrapper<>();
+        submissionWrapper.eq("student_no", studentNo).orderByDesc("submit_time");
+        List<ProjectSubmission> submissions = submissionMapper.selectList(submissionWrapper);
+        if (submissions.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Set<Integer> practiceIds = submissions.stream()
+                .map(ProjectSubmission::getPracticeId)
+                .collect(Collectors.toSet());
+        Map<Integer, ProjectPractice> projectMap = projectMapper.selectBatchIds(practiceIds).stream()
+                .collect(Collectors.toMap(ProjectPractice::getId, practice -> practice));
+
+        return submissions.stream().map(submission -> {
+            StudentProjectSubmissionVO vo = new StudentProjectSubmissionVO();
+            vo.setSubmissionId(submission.getId());
+            vo.setPracticeId(submission.getPracticeId());
+            vo.setFileUrl(submission.getFileUrl());
+            vo.setSubmitTime(submission.getSubmitTime());
+            vo.setScore(submission.getScore());
+
+            ProjectPractice practice = projectMap.get(submission.getPracticeId());
+            if (practice != null) {
+                vo.setCourseId(practice.getCourseId());
+                vo.setTitle(practice.getTitle());
+                vo.setDescription(practice.getDescription());
+                vo.setStartTime(practice.getStartTime());
+                vo.setEndTime(practice.getEndTime());
+            }
             return vo;
         }).collect(Collectors.toList());
     }
@@ -161,35 +243,49 @@ public class ProjectService {
     /**
      * 统计提交情况
      */
-    public ProjectStatsVO getProjectStats(Integer courseId) {
-        QueryWrapper<ProjectPractice> projectWrapper = new QueryWrapper<>();
-        projectWrapper.eq("course_id", courseId).orderByDesc("start_time");
-        List<ProjectPractice> projects = projectMapper.selectList(projectWrapper);
-
-        ProjectStatsVO stats = new ProjectStatsVO();
-        stats.setTotalProjects((long) projects.size());
-
-        // 统计所有项目的提交数量
-        long totalSubmissions = 0;
-        long gradedSubmissions = 0;
-
-        for (ProjectPractice project : projects) {
-            QueryWrapper<ProjectSubmission> submissionWrapper = new QueryWrapper<>();
-            submissionWrapper.eq("practice_id", project.getId());
-            List<ProjectSubmission> submissions = submissionMapper.selectList(submissionWrapper);
-
-            long submissionCount = submissions.size();
-            totalSubmissions += submissionCount;
-
-            long gradedCount = submissions.stream()
-                    .filter(s -> s.getScore() != null)
-                    .count();
-            gradedSubmissions += gradedCount;
+    public ProjectStatsVO getProjectStats(Integer practiceId) {
+        // 验证项目是否存在
+        ProjectPractice project = projectMapper.selectById(practiceId);
+        if (project == null) {
+            throw new RuntimeException("项目不存在");
         }
 
-        stats.setSubmittedProjects(totalSubmissions);
-        stats.setGradedProjects(gradedSubmissions);
-        stats.setPendingProjects(stats.getTotalProjects() - totalSubmissions);
+        // 获取项目所属课程
+        Course course = courseMapper.selectById(project.getCourseId());
+        if (course == null) {
+            throw new RuntimeException("课程不存在");
+        }
+
+        // 通过课程的 classId 获取该课程下的所有学生
+        Long classId = course.getClassId();
+        if (classId == null) {
+            throw new RuntimeException("课程未关联班级");
+        }
+
+        List<Student> students = courseClassMapper.getStudentsByClassId(classId.intValue());
+        long totalStudents = students.size();
+
+        // 获取该项目的所有提交记录
+        QueryWrapper<ProjectSubmission> submissionWrapper = new QueryWrapper<>();
+        submissionWrapper.eq("practice_id", practiceId);
+        List<ProjectSubmission> submissions = submissionMapper.selectList(submissionWrapper);
+
+        // 统计已提交学生数
+        long submittedStudents = submissions.size();
+
+        // 统计已评分学生数（提交记录中有分数的）
+        long gradedStudents = submissions.stream()
+                .filter(s -> s.getScore() != null)
+                .count();
+
+        // 待提交学生数
+        long pendingStudents = totalStudents - submittedStudents;
+
+        ProjectStatsVO stats = new ProjectStatsVO();
+        stats.setTotalStudents(totalStudents);
+        stats.setSubmittedStudents(submittedStudents);
+        stats.setGradedStudents(gradedStudents);
+        stats.setPendingStudents(pendingStudents);
 
         return stats;
     }
