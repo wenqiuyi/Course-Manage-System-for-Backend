@@ -14,6 +14,6 @@
     </select>
 
     <select id="getByTeacherNo" parameterType="string" resultMap="TeacherMap">
-        SELECT id, ava_url, name, teacher_no, gender FROM teacher WHERE teacher_no = #{teacherNo}
+        SELECT id, ava_url, name, teacher_no, gender,department FROM teacher WHERE teacher_no = #{teacherNo}
     </select>
 </mapper>

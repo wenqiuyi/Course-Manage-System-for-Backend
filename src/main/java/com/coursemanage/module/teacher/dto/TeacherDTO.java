@@ -9,4 +9,5 @@ public class TeacherDTO {
     private String teacherNo;
     private String gender;
     private String avaUrl;
+    private String department;
 }
