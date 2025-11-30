@@ -19,4 +19,5 @@ public class Student {
     private String roleType;
     private String department;
     private String major;
+    private Integer courseId;
 }
