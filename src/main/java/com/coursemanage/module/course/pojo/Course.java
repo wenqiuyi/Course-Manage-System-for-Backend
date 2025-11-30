@@ -25,5 +25,5 @@ public class Course {
     // 不加注解会报错，这里ai的做法请自行斟酌
     // 修复：添加@Transient注解，表示不映射到数据库
     // @Transient
-    private Teacher teacher;
+    // private Teacher teacher;
 }
