@@ -22,6 +22,11 @@
         FROM student WHERE student_no = #{studentNo}
     </select>
 
+    <select id="getStudentsByCourseId" parameterType="int" resultMap="StudentMap">
+        SELECT id, ava_url, name, student_no, gender, role_type, department, major,course_id
+        FROM student WHERE  course_id = #{courseId}
+    </select>
+
     <insert id="insertStudent" parameterType="com.coursemanage.module.student.pojo.Student" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO student(ava_url, name, student_no, gender, role_type, department, major)
         VALUES(#{avaUrl}, #{name}, #{studentNo}, #{gender}, #{roleType}, #{department}, #{major})
