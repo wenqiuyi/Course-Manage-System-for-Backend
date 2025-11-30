@@ -33,4 +33,8 @@ public class StudentController {
             return ApiResponse.fail(404, "未找到学号为[" + studentNo + "]的学生");
         }
     }
+    @GetMapping("/{courseId}")
+    public ApiResponse<List<Student>> getStudentsByCourseId(@PathVariable Integer courseId) {
+        return ApiResponse.success(studentService.getStudentsByCourseId(courseId));
+    }
 }
