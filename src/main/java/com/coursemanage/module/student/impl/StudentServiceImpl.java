@@ -22,4 +22,8 @@ public class StudentServiceImpl implements StudentService {
     public Student getStudentByNo(String studentNo) {
         return studentMapper.getByStudentNo(studentNo);
     }
+    @Override
+    public List<Student> getStudentsByCourseId(Integer courseId){
+        return studentMapper.getStudentsByCourseId(courseId);
+    }
 }
