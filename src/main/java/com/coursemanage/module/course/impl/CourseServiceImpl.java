@@ -33,7 +33,7 @@ public class CourseServiceImpl implements CourseService {
         Course c = courseMapper.getCourseById(id);
         if (c != null && c.getTeacherNo() != null) {
             Teacher t = teacherMapper.getByTeacherNo(c.getTeacherNo());
-            c.setTeacher(t);
+//            c.setTeacher(t);
         }
         return c;
     }
