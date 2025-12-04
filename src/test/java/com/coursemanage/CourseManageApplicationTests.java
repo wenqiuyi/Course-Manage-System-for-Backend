@@ -10,6 +10,6 @@ class CourseManageApplicationTests {
     @Test
     void contextLoads() {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        System.out.println(bCryptPasswordEncoder.encode("10002"));
+        System.out.println(bCryptPasswordEncoder.encode("10005"));
     }
 }
