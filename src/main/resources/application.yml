@@ -16,6 +16,12 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+file:
+  upload:
+    # 相对路径：./ 代表项目启动的根目录（每个成员的项目目录不同，但自动适配）
+    path: ./upload
+
+
 server:
   port: 9999
 
