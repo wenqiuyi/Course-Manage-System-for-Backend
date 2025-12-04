@@ -9,4 +9,5 @@ public interface StudentMapper {
     List<Student> getAllStudents();
     Student getByStudentNo(String studentNo);
     void insertStudent(Student student);
+    List<Student> getStudentsByCourseId(Integer courseId);
 }
