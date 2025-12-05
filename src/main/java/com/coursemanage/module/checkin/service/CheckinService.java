@@ -37,7 +37,7 @@ public class CheckinService {
      */
     @Transactional
     public Checkin startCheckin(CheckinStartRequest request, String teacherPersonNo) {
-        Course course = courseMapper.selectById(request.getCourseId());
+        Course course = getCourseById(request.getCourseId());
         if (course == null) {
             throw new RuntimeException("课程不存在");
         }
@@ -120,7 +120,7 @@ public class CheckinService {
      * 根据课程ID获取所有签到记录
      */
     public List<CheckinRecordVO> getCheckinRecordsByCourseId(Integer courseId) {
-        Course course = courseMapper.selectById(courseId);
+        Course course = getCourseById(courseId);
         if (course == null) {
             throw new RuntimeException("课程不存在");
         }
@@ -150,5 +150,15 @@ public class CheckinService {
         // TODO: replace with actual student name lookup when available
         vo.setStudentName(record.getStudentNo());
         return vo;
+    }
+
+    /**
+     * 仅选择现有字段，避免访问不存在的 class_id 列
+     */
+    private Course getCourseById(Integer courseId) {
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.select("id", "name", "description", "comment_area", "aca_year", "semester", "teacher_no")
+                .eq("id", courseId);
+        return courseMapper.selectOne(wrapper);
     }
 }
