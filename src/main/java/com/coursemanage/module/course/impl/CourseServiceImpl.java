@@ -25,7 +25,7 @@ public class CourseServiceImpl implements CourseService {
         map.put("teacherNo", teacherNo);
         map.put("acaYear", acaYear);
         map.put("semester", semester);
-        return courseMapper.getCoursesByFilter(teacherNo, acaYear, semester);
+        return courseMapper.getCourses(teacherNo, acaYear, semester);
     }
 
     @Override

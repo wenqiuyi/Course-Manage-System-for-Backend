@@ -18,7 +18,7 @@
     </select>
 
     <select id="getByStudentNo" parameterType="string" resultMap="StudentMap">
-        SELECT id, ava_url, name, student_no, gender, role_type, department, major
+        SELECT id, ava_url, name, student_no, gender, role_type, department, major,course_id
         FROM student WHERE student_no = #{studentNo}
     </select>
 
