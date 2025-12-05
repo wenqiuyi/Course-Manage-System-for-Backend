@@ -21,7 +21,7 @@ public class StudentController {
     }
 
     //根据学号获取学生
-    @GetMapping("/{studentNo}")
+    @GetMapping("/num/{studentNo}")
     public ApiResponse<Student> getStudentByNo(@PathVariable String studentNo) {
         if (studentNo == null || studentNo.trim().isEmpty()) {
             return ApiResponse.fail(404,"学号不能为空");
@@ -33,7 +33,7 @@ public class StudentController {
             return ApiResponse.fail(404, "未找到学号为[" + studentNo + "]的学生");
         }
     }
-    @GetMapping("/{courseId}")
+    @GetMapping("/course/{courseId}")
     public ApiResponse<List<Student>> getStudentsByCourseId(@PathVariable Integer courseId) {
         return ApiResponse.success(studentService.getStudentsByCourseId(courseId));
     }
