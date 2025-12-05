@@ -31,7 +31,7 @@ public class NoticeService {
     @Transactional
     public CourseNotice createNotice(NoticeCreateRequest request, String teacherPersonNo) {
         // 验证课程是否存在
-        Course course = courseMapper.selectById(request.getCourseId());
+        Course course = getCourseById(request.getCourseId());
         if (course == null) {
             throw new RuntimeException("课程不存在");
         }
@@ -66,6 +66,16 @@ public class NoticeService {
 
             return vo;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 仅选择现有字段，避免访问不存在的 class_id 列
+     */
+    private Course getCourseById(Integer courseId) {
+        QueryWrapper<Course> wrapper = new QueryWrapper<>();
+        wrapper.select("id", "name", "description", "comment_area", "aca_year", "semester", "teacher_no")
+                .eq("id", courseId);
+        return courseMapper.selectOne(wrapper);
     }
 }
 
