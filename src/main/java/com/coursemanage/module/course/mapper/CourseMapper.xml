@@ -13,7 +13,7 @@
     </resultMap>
 
     <select id="getCoursesByFilter" resultMap="CourseMap" parameterType="map">
-        SELECT id, class_id, name, description, comment_area, aca_year, semester, teacher_no
+        SELECT id, name, description, comment_area, aca_year, semester, teacher_no
         FROM course
         WHERE 1=1
         <if test="teacherNo != null and teacherNo != ''">
@@ -28,7 +28,7 @@
     </select>
 
     <select id="getCourseById" parameterType="int" resultMap="CourseMap">
-        SELECT id, class_id, name, description, comment_area, aca_year, semester, teacher_no
+        SELECT id, name, description, comment_area, aca_year, semester, teacher_no
         FROM course WHERE id = #{id}
     </select>
 </mapper>
