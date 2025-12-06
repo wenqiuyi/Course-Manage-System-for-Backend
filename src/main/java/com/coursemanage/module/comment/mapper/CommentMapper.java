@@ -1,11 +1,27 @@
 package com.coursemanage.module.comment.mapper;
 
-import com.coursemanage.module.comment.pojo.Comment;
-import org.apache.ibatis.annotations.Mapper;
+import com.coursemanage.module.comment.pojo.CourseComment;
+import org.apache.ibatis.annotations.*;
+
 import java.util.List;
 
 @Mapper
 public interface CommentMapper {
-    List<Comment> getCommentsByCourseId(Integer courseId);
-    void insertComment(Comment comment);
+
+    @Select("""
+        SELECT id,
+               course_id AS courseId,
+               commenter_no AS commenterNo,
+               content
+        FROM course_comment
+        WHERE course_id = #{courseId}
+        """)
+    List<CourseComment> getCommentsByCourseId(@Param("courseId") Integer courseId);
+
+    @Insert("""
+        INSERT INTO course_comment(course_id, commenter_no, content)
+        VALUES(#{courseId}, #{commenterNo}, #{content})
+        """)
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    void insertComment(CourseComment comment);
 }
