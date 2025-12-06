@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 // @Entity
 // @Table(name="course_comment")
-public class Comment {
+public class CourseComment {
     // @Id
     // @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

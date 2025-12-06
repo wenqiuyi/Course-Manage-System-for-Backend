@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.coursemanage.module.comment.mapper.CommentMapper">
-    <resultMap id="CommentMap" type="com.coursemanage.module.comment.pojo.Comment">
+    <resultMap id="CommentMap" type="com.coursemanage.module.comment.pojo.CourseComment">
         <id property="id" column="id"/>
         <result property="courseId" column="course_id"/>
         <result property="commenterId" column="commenter_id"/>
@@ -12,7 +12,7 @@
         SELECT id, course_id, commenter_id, content FROM comment WHERE course_id = #{courseId}
     </select>
 
-    <insert id="insertComment" parameterType="com.coursemanage.module.comment.pojo.Comment" useGeneratedKeys="true" keyProperty="id">
+    <insert id="insertComment" parameterType="com.coursemanage.module.comment.pojo.CourseComment" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO comment(course_id, commenter_id, content) VALUES(#{courseId}, #{commenterId}, #{content})
     </insert>
 </mapper>

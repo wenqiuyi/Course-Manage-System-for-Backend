@@ -28,7 +28,7 @@ public class CommentController {
     public ApiResponse<Void> postComment(@Valid @RequestBody CommentCreateDTO dto) {
         CourseComment comment = new CourseComment();
         comment.setCourseId(dto.getCourseId());
-        comment.setCommenterNo(dto.getCommenterNo());
+        comment.setCommenterId(dto.getCommenterNo());
         comment.setContent(dto.getContent());
         commentService.createComment(comment);
         return ApiResponse.successMessage("评论提交成功");
