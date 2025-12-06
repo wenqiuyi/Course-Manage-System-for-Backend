@@ -1,25 +1,18 @@
-package com.coursemanage.module.comment.impl;
+package com.coursemanage.module.comment.pojo;
 
-import com.coursemanage.module.comment.mapper.CommentMapper;
-import com.coursemanage.module.comment.pojo.CourseComment;
-import com.coursemanage.module.comment.service.CommentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
-import java.util.List;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
-@Service
-public class CommentServiceImpl implements CommentService {
-    @Autowired
-    private CommentMapper commentMapper;
-
-    @Override
-    public List<CourseComment> getCommentsByCourseId(Integer courseId) {
-        return commentMapper.getCommentsByCourseId(courseId);
-    }
-
-    @Override
-    public void createComment(CourseComment comment) {
-        commentMapper.insertComment(comment);
-    }
+@Data
+// @Entity
+// @Table(name="course_comment")
+public class Comment {
+    // @Id
+    // @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private Integer courseId;
+    private String commenterId; // student_no
+    private String content;
 }
