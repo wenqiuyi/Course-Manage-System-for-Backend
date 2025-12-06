@@ -4,6 +4,6 @@ import com.coursemanage.module.course.pojo.Course;
 import java.util.List;
 
 public interface CourseService {
-    List<Course> getCourses(String teacherNo, String acaYear, String semester);
+    List<Course> getCourses(String teacherNo);
     Course getCourseById(Integer id);
 }
