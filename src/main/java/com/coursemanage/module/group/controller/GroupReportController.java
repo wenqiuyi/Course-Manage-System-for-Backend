@@ -27,6 +27,19 @@ public class GroupReportController {
         return R.success(result);
     }
 
+    //列出已有小组，根据课程id查询
+    @GetMapping("/list")
+    public R<List<Groups>> getGroupList(
+            @RequestParam Integer courseId // 改为必填，无默认值
+    ) {
+        // 校验courseId非空（增强健壮性）
+        if (courseId == null || courseId <= 0) {
+            return R.error(400, "课程ID不能为空且必须为正整数");
+        }
+        List<Groups> groups = groupsService.getGroupsByCourseId(courseId);
+        return R.success(groups);
+    }
+
     // 5. 上传报告
     @PostMapping("/report/upload")
     public R<GroupReport> uploadReport(@RequestBody GroupReport report) {

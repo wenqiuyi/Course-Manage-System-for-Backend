@@ -23,6 +23,7 @@ public class Course {
     private String teacherNo;
 
     public void setTeacher(Teacher t) {
+
     }
     // 当返回课程详情时，可填充 teacher 信息（组合）
     // 不加注解会报错，这里ai的做法请自行斟酌
