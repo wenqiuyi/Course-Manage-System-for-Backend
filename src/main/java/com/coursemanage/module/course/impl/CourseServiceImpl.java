@@ -20,21 +20,13 @@ public class CourseServiceImpl implements CourseService {
     private TeacherMapper teacherMapper;
 
     @Override
-    public List<Course> getCourses(String teacherNo, String acaYear, String semester) {
-        Map<String,Object> map = new HashMap<>();
-        map.put("teacherNo", teacherNo);
-        map.put("acaYear", acaYear);
-        map.put("semester", semester);
-        return courseMapper.getCourses(teacherNo, acaYear, semester);
+    public List<Course> getCourses(String teacherNo) {
+
+        return courseMapper.getCourses(teacherNo);
     }
 
     @Override
     public Course getCourseById(Integer id) {
-        Course c = courseMapper.getCourseById(id);
-        if (c != null && c.getTeacherNo() != null) {
-            Teacher t = teacherMapper.getByTeacherNo(c.getTeacherNo());
-//            c.setTeacher(t);
-        }
-        return c;
+        return courseMapper.getCourseById(id);
     }
 }
