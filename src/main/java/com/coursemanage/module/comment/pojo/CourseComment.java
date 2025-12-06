@@ -13,6 +13,6 @@ public class CourseComment {
     // @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer courseId;
-    private String commenterId; // student_no
+    private String commenterNo; // student_no
     private String content;
 }
