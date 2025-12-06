@@ -8,8 +8,8 @@ public class CommentCreateDTO {
     @NotNull(message = "courseId 不能为空")
     private Integer courseId;
 
-    @NotNull(message = "commenterId 不能为空")
-    private String commenterId;
+    @NotNull(message = "commenterNo 不能为空")
+    private String commenterNo;
 
     @NotNull(message = "content 不能为空")
     private String content;
