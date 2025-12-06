@@ -1,7 +1,7 @@
 package com.coursemanage.module.comment.impl;
 
 import com.coursemanage.module.comment.mapper.CommentMapper;
-import com.coursemanage.module.comment.pojo.Comment;
+import com.coursemanage.module.comment.pojo.CourseComment;
 import com.coursemanage.module.comment.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,12 @@ public class CommentServiceImpl implements CommentService {
     private CommentMapper commentMapper;
 
     @Override
-    public List<Comment> getCommentsByCourseId(Integer courseId) {
+    public List<CourseComment> getCommentsByCourseId(Integer courseId) {
         return commentMapper.getCommentsByCourseId(courseId);
     }
 
     @Override
-    public void createComment(Comment comment) {
+    public void createComment(CourseComment comment) {
         commentMapper.insertComment(comment);
     }
 }
