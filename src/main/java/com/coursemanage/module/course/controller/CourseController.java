@@ -17,10 +17,16 @@ public class CourseController {
 
     @GetMapping("/class/{teacherNo}")
     public ApiResponse<List<Course>> getCourses(@PathVariable String teacherNo) {
+
         if (teacherNo == null || teacherNo.trim().isEmpty()) {
             return ApiResponse.fail(400, "教师编号不能为空");
         }
         return ApiResponse.success(courseService.getCourses(teacherNo));
+    }
+
+    @GetMapping("/class")
+    public ApiResponse<List<Course>> getAllCourses() {
+        return ApiResponse.success(courseService.getAllCourses());
     }
 
 
