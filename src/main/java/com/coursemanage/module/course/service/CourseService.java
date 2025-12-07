@@ -5,5 +5,6 @@ import java.util.List;
 
 public interface CourseService {
     List<Course> getCourses(String teacherNo);
+    List<Course> getAllCourses();
     Course getCourseById(Integer id);
 }
