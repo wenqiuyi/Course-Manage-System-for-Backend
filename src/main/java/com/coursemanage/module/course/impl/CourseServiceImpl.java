@@ -24,6 +24,11 @@ public class CourseServiceImpl implements CourseService {
 
         return courseMapper.getCourses(teacherNo);
     }
+    @Override
+    public List<Course> getAllCourses() {
+
+        return courseMapper.getAllCourses();
+    }
 
     @Override
     public Course getCourseById(Integer id) {
