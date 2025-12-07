@@ -14,6 +14,13 @@ public interface CourseMapper {
             "semester, teacher_no AS teacherNo " +
             "FROM course WHERE teacher_no = #{teacherNo}")
     List<Course> getCourses(@Param("teacherNo") String teacherNo);
+    
+    @Select("SELECT id, name, description, " +
+            "comment_area AS commentArea, " +
+            "aca_year AS acaYear, " +
+            "semester, teacher_no AS teacherNo " +
+            "FROM course")
+    List<Course> getAllCourses();
 
     @Select("SELECT id, name, description, " +
             "comment_area AS commentArea, " +
