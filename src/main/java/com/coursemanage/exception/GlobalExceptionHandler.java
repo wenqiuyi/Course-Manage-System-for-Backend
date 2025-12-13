@@ -56,6 +56,18 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(400, errorMessage);
     }
 
+    // 处理无权操作异常
+    @ExceptionHandler(SecurityException.class)
+    public ApiResponse<Void> handleSecurityException(SecurityException e) {
+        return ApiResponse.error(403, e.getMessage());
+    }
+
+    // 处理邮件不存在异常
+    @ExceptionHandler(RuntimeException.class)
+    public ApiResponse<Void> handleRuntimeException(RuntimeException e) {
+        return ApiResponse.error(404, e.getMessage());
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {

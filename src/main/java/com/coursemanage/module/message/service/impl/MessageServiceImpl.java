@@ -78,8 +78,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     // ========== 工具方法：校验邮件权限 ==========
     private Message getValidMessage(Integer messageId, String userNo) {
         Message message = this.getById(messageId);
-        if (message == null || (!message.getSenderNo().equals(userNo) && !message.getReceiverNo().equals(userNo))) {
-            throw new RuntimeException("邮件不存在或无权操作");
+        if (message == null) {
+            throw new RuntimeException("邮件不存在");
+        }
+        // 校验是否为发送者或接收者
+        if (!userNo.equals(message.getSenderNo()) && !userNo.equals(message.getReceiverNo())) {
+            throw new SecurityException("无权操作此邮件");
         }
         return message;
     }
@@ -129,6 +133,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
 
     @Override
     public MessageVO getMessageDetail(Integer id, String userNo) {
+
         Message message = getValidMessage(id, userNo);
         // 未读邮件自动标记为已读
         if ("inbox".equals(message.getFolder()) && "未读".equals(message.getStatus())) {
@@ -144,6 +149,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         // 1. 校验收件人
         if (!checkUserExists(request.getReceiverNo())) {
             throw new RuntimeException("接收者学工号不存在");
+        }
+        // 2. 检查是否发送给自己
+        if (senderNo.equals(request.getReceiverNo())) {
+            throw new RuntimeException("不能向自己发送邮件");
         }
 
         // 2. 构建收件人邮件（inbox，未读）
@@ -350,9 +359,21 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchDelete(List<Integer> messageIds, String userNo) {
+        // 批量查询邮件
+        List<Message> messages = this.listByIds(messageIds);
+        if (messages.size() != messageIds.size()) {
+            throw new RuntimeException("存在无效的邮件ID");
+        }
+        // 逐个校验权限
+        for (Message message : messages) {
+            if (!userNo.equals(message.getSenderNo()) && !userNo.equals(message.getReceiverNo())) {
+                throw new SecurityException("存在无权操作的邮件");
+            }
+        }
         for (Integer id : messageIds) {
             deleteToTrash(id, userNo);
         }
+        this.removeByIds(messageIds);
     }
 
     @Override
