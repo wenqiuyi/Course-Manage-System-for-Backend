@@ -36,6 +36,7 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(400, errorMessage);
     }
 
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiResponse<Void> handleConstraintViolation(ConstraintViolationException ex) {
@@ -62,11 +63,18 @@ public class GlobalExceptionHandler {
         return ApiResponse.error(403, e.getMessage());
     }
 
-    // 处理邮件不存在异常
-    @ExceptionHandler(RuntimeException.class)
-    public ApiResponse<Void> handleRuntimeException(RuntimeException e) {
-        return ApiResponse.error(404, e.getMessage());
+    // 处理收件人不存在的自定义异常
+    @ExceptionHandler(RecipientNotFoundException.class)
+    public ApiResponse<Void> handleRecipientNotFoundException(RecipientNotFoundException e) {
+        return ApiResponse.error(400, e.getMessage()); // 400状态码+明确提示
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ApiResponse<Void> handleRecipientNotFound(RuntimeException e) {
+        // 其他RuntimeException按原有逻辑处理（如系统异常返回500）
+        return ApiResponse.error(500, "系统异常：" + e.getMessage());
+    }
+
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

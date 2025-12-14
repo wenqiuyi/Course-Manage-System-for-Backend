@@ -22,8 +22,8 @@ public interface MessageService extends IService<Message> {
     // 邮件写入
     Message sendMessage(MessageSendRequest request, String senderNo);
     Message replyMessage(Integer messageId, MessageReplyRequest request, String senderNo);
-    Message saveDraft(DraftSaveRequest request, String userNo);
-    Message updateDraft(Integer draftId, DraftSaveRequest request, String userNo);
+    Message saveDraft(DraftSaveRequest request, String userNo,Integer draftId);
+
 
     // 状态更新
     void markAsRead(Integer messageId, String userNo);

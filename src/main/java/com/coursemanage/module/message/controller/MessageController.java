@@ -80,14 +80,9 @@ public class MessageController {
     }
 
     @PostMapping("/draft/save")
-    public ApiResponse<Message> saveDraft(@Valid @RequestBody DraftSaveRequest request) {
-        return ApiResponse.success(messageService.saveDraft(request, getCurrentUserNo()));
-    }
-
-    @PutMapping("/draft/update/{id}")
-    public ApiResponse<Message> updateDraft(@PathVariable Integer id,
-                                            @Valid @RequestBody DraftSaveRequest request) {
-        return ApiResponse.success(messageService.updateDraft(id, request, getCurrentUserNo()));
+    public ApiResponse<Message> saveDraft(@RequestParam(required = false) Integer draftId,
+                                          @Valid @RequestBody DraftSaveRequest request) {
+        return ApiResponse.success(messageService.saveDraft(request, getCurrentUserNo(), draftId));
     }
 
     // ========== 三、状态更新 ==========

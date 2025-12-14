@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.coursemanage.exception.RecipientNotFoundException;
 import com.coursemanage.module.login.pojo.User;
 import com.coursemanage.module.login.service.UserService;
 import com.coursemanage.module.message.dto.*;
@@ -40,11 +41,18 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     // ========== 核心工具方法：构建通用邮件查询条件 ==========
     private LambdaQueryWrapper<Message> buildMessageQueryWrapper(String userNo, String folder, String keyword) {
         LambdaQueryWrapper<Message> wrapper = new LambdaQueryWrapper<>();
-        // 权限过滤：当前用户是发送者或接收者
-        wrapper.and(w -> w.eq(Message::getSenderNo, userNo).or().eq(Message::getReceiverNo, userNo));
-        // 文件夹过滤（可选）
-        if (folder != null && !folder.isEmpty()) {
-            wrapper.eq(Message::getFolder, folder);
+        if ("inbox".equals(folder)) {
+            // 收件箱：只能是接收者且文件夹为inbox
+            wrapper.eq(Message::getReceiverNo, userNo)
+                    .eq(Message::getFolder, "inbox");
+        } else if ("sent".equals(folder)) {
+            // 已发送：只能是发送者且文件夹为sent
+            wrapper.eq(Message::getSenderNo, userNo)
+                    .eq(Message::getFolder, "sent");
+        } else {
+            // 其他文件夹：当前用户是发送者或接收者，且匹配文件夹
+            wrapper.and(w -> w.eq(Message::getSenderNo, userNo).or().eq(Message::getReceiverNo, userNo))
+                    .eq(Message::getFolder, folder);
         }
         // 关键词过滤（标题/内容/发送者，可选）
         if (keyword != null && !keyword.isEmpty()) {
@@ -148,8 +156,10 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
     public Message sendMessage(MessageSendRequest request, String senderNo) {
         // 1. 校验收件人
         if (!checkUserExists(request.getReceiverNo())) {
-            throw new RuntimeException("接收者学工号不存在");
+            // 抛自定义异常（不再抛普通RuntimeException）
+            throw new RecipientNotFoundException("接收者学工号不存在");
         }
+
         // 2. 检查是否发送给自己
         if (senderNo.equals(request.getReceiverNo())) {
             throw new RuntimeException("不能向自己发送邮件");
@@ -199,65 +209,66 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> impl
         return senderMsg;
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Message saveDraft(DraftSaveRequest request, String userNo) {
-        Message draft = new Message();
-        draft.setSenderNo(userNo);
-        draft.setReceiverNo(request.getReceiverNo() == null ? "" : request.getReceiverNo());
-        draft.setSubject(request.getSubject() == null ? "" : request.getSubject());
-        draft.setContent(request.getContent() == null ? "" : request.getContent());
-        draft.setFolder("drafts");
-        draft.setIsStar(false);
-        draft.setIsDraft(true);
-        draft.setStatus("未读");
-        draft.setSendTime(LocalDateTime.now());
-        draft.setCreateTime(LocalDateTime.now());
-        draft.setUpdateTime(LocalDateTime.now());
-        this.save(draft); // MyBatis-Plus内置save
-
-        // 关联附件
-        if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
-            for (Integer attId : request.getAttachmentIds()) {
-                MailAttachment att = mailAttachmentMapper.selectById(attId);
-                if (att != null) {
-                    att.setMessageId(draft.getId());
-                    mailAttachmentMapper.updateById(att);
-                }
-            }
-        }
-        return draft;
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Message updateDraft(Integer draftId, DraftSaveRequest request, String userNo) {
-        Message draft = getValidMessage(draftId, userNo);
-        if (!draft.getIsDraft()) {
-            throw new RuntimeException("非草稿邮件无法更新");
-        }
+    public Message saveDraft(DraftSaveRequest request, String userNo, Integer draftId) {
+        // 如果有draftId则更新，否则创建新草稿
+        if (draftId != null) {
+            Message draft = getValidMessage(draftId, userNo);
+            if (!draft.getIsDraft()) {
+                throw new RuntimeException("非草稿邮件无法更新");
+            }
 
-        // 更新草稿内容
-        draft.setReceiverNo(request.getReceiverNo() == null ? draft.getReceiverNo() : request.getReceiverNo());
-        draft.setSubject(request.getSubject() == null ? draft.getSubject() : request.getSubject());
-        draft.setContent(request.getContent() == null ? draft.getContent() : request.getContent());
-        draft.setUpdateTime(LocalDateTime.now());
-        this.updateById(draft); // MyBatis-Plus内置updateById
+            // 更新草稿内容
+            draft.setReceiverNo(request.getReceiverNo() == null ? draft.getReceiverNo() : request.getReceiverNo());
+            draft.setSubject(request.getSubject() == null ? draft.getSubject() : request.getSubject());
+            draft.setContent(request.getContent() == null ? draft.getContent() : request.getContent());
+            draft.setUpdateTime(LocalDateTime.now());
+            this.updateById(draft);
 
-        // 清空原有附件关联，重新绑定
-        if (request.getAttachmentIds() != null) {
-            mailAttachmentMapper.delete(
-                    new LambdaQueryWrapper<MailAttachment>().eq(MailAttachment::getMessageId, draftId)
-            ); // MyBatis-Plus内置delete
-            for (Integer attId : request.getAttachmentIds()) {
-                MailAttachment att = mailAttachmentMapper.selectById(attId);
-                if (att != null) {
-                    att.setMessageId(draftId);
-                    mailAttachmentMapper.updateById(att);
+            // 清空原有附件关联，重新绑定
+            if (request.getAttachmentIds() != null) {
+                mailAttachmentMapper.delete(
+                        new LambdaQueryWrapper<MailAttachment>().eq(MailAttachment::getMessageId, draftId)
+                );
+                for (Integer attId : request.getAttachmentIds()) {
+                    MailAttachment att = mailAttachmentMapper.selectById(attId);
+                    if (att != null) {
+                        att.setMessageId(draftId);
+                        mailAttachmentMapper.updateById(att);
+                    }
                 }
             }
+            return draft;
+        } else {
+            // 创建新草稿
+            Message draft = new Message();
+            draft.setSenderNo(userNo);
+            draft.setReceiverNo(request.getReceiverNo() == null ? "" : request.getReceiverNo());
+            draft.setSubject(request.getSubject() == null ? "" : request.getSubject());
+            draft.setContent(request.getContent() == null ? "" : request.getContent());
+            draft.setFolder("drafts");
+            draft.setIsStar(false);
+            draft.setIsDraft(true);
+            draft.setStatus("未读");
+            draft.setSendTime(LocalDateTime.now());
+            draft.setCreateTime(LocalDateTime.now());
+            draft.setUpdateTime(LocalDateTime.now());
+            this.save(draft);
+
+            // 关联附件
+            if (request.getAttachmentIds() != null && !request.getAttachmentIds().isEmpty()) {
+                for (Integer attId : request.getAttachmentIds()) {
+                    MailAttachment att = mailAttachmentMapper.selectById(attId);
+                    if (att != null) {
+                        att.setMessageId(draft.getId());
+                        mailAttachmentMapper.updateById(att);
+                    }
+                }
+            }
+            return draft;
         }
-        return draft;
     }
 
     @Override
