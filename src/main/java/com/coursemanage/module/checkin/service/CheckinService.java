@@ -117,9 +117,9 @@ public class CheckinService {
     }
 
     /**
-     * 根据课程ID获取所有签到记录
+     * 根据课程ID获取该课程下的签到任务列表
      */
-    public List<CheckinRecordVO> getCheckinRecordsByCourseId(Integer courseId) {
+    public List<Checkin> getCheckinsByCourseId(Integer courseId) {
         Course course = getCourseById(courseId);
         if (course == null) {
             throw new RuntimeException("课程不存在");
@@ -132,16 +132,8 @@ public class CheckinService {
             return Collections.emptyList();
         }
 
-        List<Integer> checkinIds = checkins.stream()
-                .map(Checkin::getId)
-                .collect(Collectors.toList());
-
-        QueryWrapper<CheckinRecord> recordQuery = new QueryWrapper<>();
-        recordQuery.in("checkin_id", checkinIds);
-        List<CheckinRecord> records = checkinRecordMapper.selectList(recordQuery);
-        return records.stream()
-                .map(this::buildRecordVO)
-                .collect(Collectors.toList());
+        // 仅返回签到任务（checkin）列表，不再汇总学生签到记录
+        return checkins;
     }
 
     private CheckinRecordVO buildRecordVO(CheckinRecord record) {
