@@ -8,4 +8,6 @@ import java.util.List;
 public interface CommentService {
     List<CourseComment> getCommentsByCourseId(Integer courseId);
     void createComment(CourseComment comment);
+
+    void deleteComment(Integer id);
 }
