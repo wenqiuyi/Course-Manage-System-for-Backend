@@ -1,5 +1,7 @@
 package com.coursemanage.module.student.controller;
 
+import com.coursemanage.module.student.dto.AssignCourseDTO;
+import com.coursemanage.module.student.dto.BatchAssignCourseDTO;
 import com.coursemanage.module.student.pojo.Student;
 import com.coursemanage.module.student.service.StudentService;
 import com.coursemanage.module.util.ApiResponse;
@@ -19,7 +21,6 @@ public class StudentController {
     public ApiResponse<List<Student>> getAllStudents() {
         return ApiResponse.success(studentService.getAllStudents());
     }
-
     //根据学号获取学生
     @GetMapping("/num/{studentNo}")
     public ApiResponse<Student> getStudentByNo(@PathVariable String studentNo) {
@@ -37,4 +38,44 @@ public class StudentController {
     public ApiResponse<List<Student>> getStudentsByCourseId(@PathVariable Integer courseId) {
         return ApiResponse.success(studentService.getStudentsByCourseId(courseId));
     }
+
+    @PostMapping("/{studentNo}")
+    public ApiResponse<String> assignStudentToCourse(
+            @PathVariable String studentNo,
+            @RequestBody AssignCourseDTO dto) {
+
+        boolean success = studentService.assignStudentToCourse(studentNo, dto.getCourseId());
+        if (success) {
+            return ApiResponse.success("学生添加成功");
+        } else {
+            return ApiResponse.fail(400, "学生不存在或班级ID无效");
+        }
+    }
+
+    // 从课程中移除学生
+    @PostMapping("/delete/{studentNo}")
+    public ApiResponse<String> removeStudentFromCourse(
+            @PathVariable String studentNo,
+            @RequestBody AssignCourseDTO dto) {
+
+        boolean success = studentService.removeStudentFromCourse(studentNo);
+        if (success) {
+            return ApiResponse.success("学生删除成功");
+        } else {
+            return ApiResponse.fail(400, "学生不存在或班级ID无效");
+        }
+    }
+    @PostMapping("/batch-assign/{courseId}")
+    public ApiResponse<?> batchAssignStudents(
+            @PathVariable Integer courseId,
+            @RequestBody BatchAssignCourseDTO dto) {
+        boolean success = studentService.batchAssignStudentsToCourse(dto.getStudentNos(), courseId);
+        if (success) {
+
+            return ApiResponse.success(studentService.getStudentsByCourseId(courseId));
+        } else {
+            return ApiResponse.fail(400, "学生不存在");
+        }
+    }
+
 }
