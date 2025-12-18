@@ -11,6 +11,10 @@ public class ProjectVO {
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    /**
+     * 是否为小组项目：true-小组项目，false-个人项目
+     */
+    private Boolean isGroupProject;
 }
 
 
