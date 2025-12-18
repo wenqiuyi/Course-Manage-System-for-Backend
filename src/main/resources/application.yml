@@ -28,6 +28,8 @@ server:
 logging:
   level:
     org.springframework.security: DEBUG
+  # 禁用默认的日志配置，使用自定义的logback-spring.xml
+  config: classpath:logback-spring.xml
 
 mybatis-plus:
   configuration:
