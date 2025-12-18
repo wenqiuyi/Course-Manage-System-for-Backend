@@ -67,6 +67,7 @@ public class ProjectService {
         project.setCourseId(request.getCourseId());
         project.setTitle(request.getTitle());
         project.setDescription(request.getDescription());
+        project.setIsGroupProject(request.getIsGroupProject());
         project.setStartTime(request.getStartTime());
         project.setEndTime(request.getEndTime());
 
@@ -102,6 +103,7 @@ public class ProjectService {
         // 更新项目信息
         project.setTitle(request.getTitle());
         project.setDescription(request.getDescription());
+        project.setIsGroupProject(request.getIsGroupProject());
         project.setStartTime(request.getStartTime());
         project.setEndTime(request.getEndTime());
 
