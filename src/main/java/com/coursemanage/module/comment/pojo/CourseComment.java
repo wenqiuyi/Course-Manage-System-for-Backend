@@ -1,9 +1,12 @@
 package com.coursemanage.module.comment.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Data
 // @Entity
@@ -15,4 +18,5 @@ public class CourseComment {
     private Integer courseId;
     private String commenterNo; // student_no
     private String content;
+    private String createTime;
 }

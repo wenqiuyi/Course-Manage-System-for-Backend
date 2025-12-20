@@ -5,7 +5,7 @@ import com.coursemanage.module.comment.pojo.CourseComment;
 import com.coursemanage.module.comment.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.Resource;
+
 import java.util.List;
 
 @Service
@@ -21,5 +21,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void createComment(CourseComment comment) {
         commentMapper.insertComment(comment);
+    }
+    @Override
+    public void deleteComment(Integer id){
+        commentMapper.deleteComment(id);
     }
 }

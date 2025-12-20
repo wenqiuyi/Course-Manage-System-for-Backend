@@ -1,5 +1,6 @@
 package com.coursemanage.module.course.controller;
 
+import com.coursemanage.module.course.dto.CourseUpdateDTO;
 import com.coursemanage.module.course.pojo.Course;
 import com.coursemanage.module.course.service.CourseService;
 import com.coursemanage.module.util.ApiResponse;
@@ -30,6 +31,7 @@ public class CourseController {
     }
 
 
+
     @GetMapping("/{id}")
     public ApiResponse<Course> getCourse(@PathVariable Integer id) {
         if (id == null || id <= 0) {
@@ -41,4 +43,20 @@ public class CourseController {
         }
         return ApiResponse.success(course);
     }
+    
+
+    @PostMapping("/update/{id}")
+    public ApiResponse<? extends Object> updateCourse(
+            @PathVariable Integer id,
+            @RequestBody CourseUpdateDTO dto) {
+
+        boolean result = courseService.updateCourse(id, dto);
+        return result ? ApiResponse.success("更新信息成功")
+                : ApiResponse.fail(500, "课程更新失败");
+    }
+
+
+
+
+
 }

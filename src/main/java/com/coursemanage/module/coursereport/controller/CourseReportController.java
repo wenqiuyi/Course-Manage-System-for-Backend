@@ -27,15 +27,15 @@ public class CourseReportController {
             return ResponseResult.error();
     }
     @PostMapping("/")
-    public ResponseResult<Void> addCourseReport(@RequestBody CourseReport courseReport) {
+    public ResponseResult<CourseReport> addCourseReport(@RequestBody CourseReport courseReport) {
         courseReport.setId(null);
         boolean save = courseReportService.save(courseReport);
-        return save ? ResponseResult.success() : ResponseResult.error();
+        return save ? ResponseResult.success(courseReport) : ResponseResult.error();
     }
     @PutMapping("/")
-    public ResponseResult<Void> updateCourseReport(@RequestBody CourseReport courseReport) {
+    public ResponseResult<CourseReport> updateCourseReport(@RequestBody CourseReport courseReport) {
         boolean b = courseReportService.updateById(courseReport);
-        return b ? ResponseResult.success() : ResponseResult.error();
+        return b ? ResponseResult.success(courseReport) : ResponseResult.error();
     }
     @DeleteMapping("/{id}")
     public ResponseResult<Void> deleteCourseReport(@PathVariable Integer id) {

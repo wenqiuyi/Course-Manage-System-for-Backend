@@ -17,5 +17,9 @@ public class ProjectPractice {
     private String description;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    /**
+     * 是否为小组项目：0-否，1-是
+     */
+    private Boolean isGroupProject;
 }
 

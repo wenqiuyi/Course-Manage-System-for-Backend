@@ -7,4 +7,10 @@ public interface StudentService {
     List<Student> getAllStudents();
     Student getStudentByNo(String studentNo);
     List<Student> getStudentsByCourseId(Integer courseId);
+
+    boolean assignStudentToCourse(String studentNo, Integer courseId);
+
+    boolean removeStudentFromCourse(String studentNo);
+
+    boolean batchAssignStudentsToCourse(List<String> studentNos, Integer courseId);
 }

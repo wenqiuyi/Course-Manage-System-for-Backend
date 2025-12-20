@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class CourseReport {
     // id
     @TableId(type = IdType.AUTO)
+    @JsonIgnore
     @JsonProperty("id")
     private Integer id;
     // 班级id

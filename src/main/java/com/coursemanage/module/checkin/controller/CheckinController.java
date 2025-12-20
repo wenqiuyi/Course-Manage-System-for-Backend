@@ -75,15 +75,15 @@ public class CheckinController {
     }
 
     /**
-     * 根据课程ID获取签到记录
+     * 根据课程ID获取签到任务列表（只返回签到项，不返回具体签到记录）
      * GET /api/sign/course-records?courseId=xxx
      */
     @GetMapping("/course-records")
-    public ApiResponse<List<CheckinRecordVO>> getCourseCheckinRecords(
+    public ApiResponse<List<Checkin>> getCourseCheckinRecords(
             @RequestParam Integer courseId) {
         try {
-            List<CheckinRecordVO> records = checkinService.getCheckinRecordsByCourseId(courseId);
-            return ApiResponse.success(records);
+            List<Checkin> checkins = checkinService.getCheckinsByCourseId(courseId);
+            return ApiResponse.success(checkins);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage());
         }
