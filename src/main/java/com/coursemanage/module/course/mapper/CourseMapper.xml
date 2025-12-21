@@ -31,4 +31,15 @@
         SELECT id, name, description, comment_area, aca_year, semester, teacher_no
         FROM course WHERE id = #{id}
     </select>
+    
+    <!-- 插入课程 -->
+    <insert id="insert" parameterType="com.coursemanage.module.course.pojo.Course" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course(name, description, comment_area, aca_year, semester, teacher_no)
+        VALUES(#{name}, #{description}, #{commentArea}, #{acaYear}, #{semester}, #{teacherNo})
+    </insert>
+    
+    <!-- 删除课程 -->
+    <delete id="deleteById" parameterType="int">
+        DELETE FROM course WHERE id = #{id}
+    </delete>
 </mapper>

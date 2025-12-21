@@ -56,4 +56,26 @@ public class CourseServiceImpl implements CourseService {
 
         return courseMapper.updateById(course) > 0;
     }
+    
+    @Override
+    @Transactional
+    public boolean addCourse(Course course) {
+        // 检查教师是否存在
+        if (course.getTeacherNo() != null) {
+            // 可以在这里添加教师存在性检查逻辑
+        }
+        
+        return courseMapper.insert(course) > 0;
+    }
+    
+    @Override
+    @Transactional
+    public boolean deleteCourse(Integer id) {
+        Course course = courseMapper.getCourseById(id);
+        if (course == null) {
+            throw new RuntimeException("课程不存在");
+        }
+        
+        return courseMapper.deleteById(id) > 0;
+    }
 }

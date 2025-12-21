@@ -1,10 +1,7 @@
 package com.coursemanage.module.course.mapper;
 
 import com.coursemanage.module.course.pojo.Course;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -42,4 +39,16 @@ public interface CourseMapper {
         WHERE id = #{id}
         """)
     int updateById(Course course);
+    
+    // 添加课程
+    @Insert("""
+        INSERT INTO course(name, description, comment_area, aca_year, semester, teacher_no)
+        VALUES(#{name}, #{description}, #{commentArea}, #{acaYear}, #{semester}, #{teacherNo})
+        """)
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    int insert(Course course);
+    
+    // 删除课程
+    @Delete("DELETE FROM course WHERE id = #{id}")
+    int deleteById(@Param("id") Integer id);
 }

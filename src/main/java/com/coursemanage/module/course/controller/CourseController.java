@@ -54,9 +54,22 @@ public class CourseController {
         return result ? ApiResponse.success("更新信息成功")
                 : ApiResponse.fail(500, "课程更新失败");
     }
-
-
-
-
-
+    
+    @PostMapping("/add")
+    public ApiResponse<String> addCourse(@RequestBody Course course) {
+        boolean result = courseService.addCourse(course);
+        return result ? ApiResponse.success("添加课程成功")
+                : ApiResponse.fail(500, "添加课程失败");
+    }
+    
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse<String> deleteCourse(@PathVariable Integer id) {
+        try {
+            boolean result = courseService.deleteCourse(id);
+            return result ? ApiResponse.success("删除课程成功")
+                    : ApiResponse.fail(500, "删除课程失败");
+        } catch (RuntimeException e) {
+            return ApiResponse.fail(404, e.getMessage());
+        }
+    }
 }
