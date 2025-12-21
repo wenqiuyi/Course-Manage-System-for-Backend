@@ -21,9 +21,9 @@ public class LoginRegisterController {
     public ResponseResult<Map<String, Object>> login(@RequestBody User user) {
         return loginRegisterService.login(user);
     }
-//    @PostMapping("/register")
-//    @PreAuthorize("hasAuthority('manager')")
-//    public ResponseResult<Map<String, Object>> register(@RequestBody User user){
-//        return loginRegisterService.register(user);
-//    }
+    @PostMapping("/register")
+    @PreAuthorize("hasAnyAuthority({'teacher', 'manager'})")
+    public ResponseResult<Map<String, Object>> register(@RequestBody User user){
+        return loginRegisterService.register(user);
+    }
 }
