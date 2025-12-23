@@ -35,6 +35,17 @@ public interface StudentMapper {
         SELECT id, ava_url, name, student_no, gender, role_type,
                department, major, course_id
         FROM student
+        WHERE id = #{id}
+    """)
+    @ResultMap("StudentMap")
+    Student getById(@Param("id") Integer id);
+
+
+
+    @Select("""
+        SELECT id, ava_url, name, student_no, gender, role_type,
+               department, major, course_id
+        FROM student
         WHERE student_no = #{studentNo}
     """)
     @ResultMap("StudentMap")
