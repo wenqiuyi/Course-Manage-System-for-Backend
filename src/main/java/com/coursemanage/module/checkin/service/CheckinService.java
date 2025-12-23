@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.coursemanage.module.checkin.dto.CheckinRecordVO;
 import com.coursemanage.module.checkin.dto.CheckinStartRequest;
 import com.coursemanage.module.checkin.dto.CheckinSubmitRequest;
+import com.coursemanage.module.checkin.dto.StudentCheckinStatusVO;
+import com.coursemanage.module.checkin.dto.StudentCheckinStatusSimpleVO;
 import com.coursemanage.module.checkin.entity.Checkin;
 import com.coursemanage.module.checkin.entity.CheckinRecord;
 import com.coursemanage.module.checkin.mapper.CheckinMapper;
 import com.coursemanage.module.checkin.mapper.CheckinRecordMapper;
 import com.coursemanage.pojo.entity.Course;
 import com.coursemanage.pojo.mapper.CourseEntityMapper;
+import com.coursemanage.module.student.mapper.StudentMapper;
+import com.coursemanage.module.student.pojo.Student;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +37,9 @@ public class CheckinService {
 
     @Autowired
     private CourseEntityMapper courseMapper;
+
+    @Autowired
+    private StudentMapper studentMapper;
 
     /**
      * 教师发起签到
@@ -134,6 +143,101 @@ public class CheckinService {
 
         // 仅返回签到任务（checkin）列表，不再汇总学生签到记录
         return checkins;
+    }
+
+    /**
+     * 根据学生学号获取其所有签到任务及签到状态
+     */
+    public List<StudentCheckinStatusVO> getStudentCheckinsByNo(String studentNo) {
+        if (studentNo == null || studentNo.isEmpty()) {
+            throw new RuntimeException("学号不能为空");
+        }
+        Student student = studentMapper.getByStudentNo(studentNo);
+        if (student == null) {
+            throw new RuntimeException("学生不存在");
+        }
+        Integer courseId = student.getCourseId();
+        if (courseId == null) {
+            return Collections.emptyList();
+        }
+
+        Course course = getCourseById(courseId);
+        if (course == null) {
+            throw new RuntimeException("课程不存在");
+        }
+
+        QueryWrapper<Checkin> checkinQuery = new QueryWrapper<>();
+        checkinQuery.eq("course_id", courseId);
+        List<Checkin> checkins = checkinMapper.selectList(checkinQuery);
+        if (checkins == null || checkins.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> checkinIds = checkins.stream()
+                .map(Checkin::getId)
+                .collect(Collectors.toList());
+
+        QueryWrapper<CheckinRecord> recordQuery = new QueryWrapper<>();
+        recordQuery.eq("student_no", student.getStudentNo())
+                .in("checkin_id", checkinIds);
+        List<CheckinRecord> records = checkinRecordMapper.selectList(recordQuery);
+
+        Map<Integer, CheckinRecord> recordMap = records.stream()
+                .collect(Collectors.toMap(CheckinRecord::getCheckinId, Function.identity(), (a, b) -> a));
+
+        return checkins.stream().map(checkin -> {
+            StudentCheckinStatusVO vo = new StudentCheckinStatusVO();
+            vo.setCheckinId(checkin.getId());
+            vo.setCourseId(checkin.getCourseId());
+            vo.setTitle(checkin.getTitle());
+            vo.setDescription(checkin.getDescription());
+            vo.setStartTime(checkin.getStartTime());
+            vo.setEndTime(checkin.getEndTime());
+
+            CheckinRecord record = recordMap.get(checkin.getId());
+            if (record != null) {
+                vo.setStatus(record.getStatus() != null && record.getStatus());
+                vo.setCheckinTime(record.getCheckinTime());
+            } else {
+                vo.setStatus(false);
+                vo.setCheckinTime(null);
+            }
+            return vo;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据签到ID与学号查询是否已签到
+     */
+    public StudentCheckinStatusSimpleVO getCheckinStatus(Integer checkinId, String studentNo) {
+        if (checkinId == null) {
+            throw new RuntimeException("checkinId 不能为空");
+        }
+        if (studentNo == null || studentNo.isEmpty()) {
+            throw new RuntimeException("studentNo 不能为空");
+        }
+
+        Checkin checkin = checkinMapper.selectById(checkinId);
+        if (checkin == null) {
+            throw new RuntimeException("签到不存在");
+        }
+
+        QueryWrapper<CheckinRecord> recordQuery = new QueryWrapper<>();
+        recordQuery.eq("checkin_id", checkinId)
+                .eq("student_no", studentNo);
+        CheckinRecord record = checkinRecordMapper.selectOne(recordQuery);
+
+        StudentCheckinStatusSimpleVO vo = new StudentCheckinStatusSimpleVO();
+        vo.setCheckinId(checkinId);
+        vo.setStudentNo(studentNo);
+        if (record != null) {
+            vo.setStatus(record.getStatus() != null && record.getStatus());
+            vo.setCheckinTime(record.getCheckinTime());
+        } else {
+            vo.setStatus(false);
+            vo.setCheckinTime(null);
+        }
+        return vo;
     }
 
     private CheckinRecordVO buildRecordVO(CheckinRecord record) {
