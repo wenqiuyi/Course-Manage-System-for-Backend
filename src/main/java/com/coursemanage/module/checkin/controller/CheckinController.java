@@ -4,6 +4,8 @@ import com.coursemanage.pojo.dto.ApiResponse;
 import com.coursemanage.module.checkin.dto.CheckinRecordVO;
 import com.coursemanage.module.checkin.dto.CheckinStartRequest;
 import com.coursemanage.module.checkin.dto.CheckinSubmitRequest;
+import com.coursemanage.module.checkin.dto.StudentCheckinStatusVO;
+import com.coursemanage.module.checkin.dto.StudentCheckinStatusSimpleVO;
 import com.coursemanage.module.checkin.entity.Checkin;
 import com.coursemanage.module.checkin.entity.CheckinRecord;
 import com.coursemanage.module.checkin.service.CheckinService;
@@ -84,6 +86,37 @@ public class CheckinController {
         try {
             List<Checkin> checkins = checkinService.getCheckinsByCourseId(courseId);
             return ApiResponse.success(checkins);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 根据学生学号获取其所有签到项及签到状态
+     * GET /api/sign/student-checkins?studentNo=10001
+     */
+    @GetMapping("/student-checkins")
+    public ApiResponse<List<StudentCheckinStatusVO>> getStudentCheckins(
+            @RequestParam String studentNo) {
+        try {
+            List<StudentCheckinStatusVO> checkins = checkinService.getStudentCheckinsByNo(studentNo);
+            return ApiResponse.success(checkins);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 根据签到ID和学生学号查询是否已签到
+     * GET /api/sign/check-status?checkinId=1&studentNo=10001
+     */
+    @GetMapping("/check-status")
+    public ApiResponse<StudentCheckinStatusSimpleVO> getCheckinStatus(
+            @RequestParam Integer checkinId,
+            @RequestParam String studentNo) {
+        try {
+            StudentCheckinStatusSimpleVO status = checkinService.getCheckinStatus(checkinId, studentNo);
+            return ApiResponse.success(status);
         } catch (Exception e) {
             return ApiResponse.error(e.getMessage());
         }
