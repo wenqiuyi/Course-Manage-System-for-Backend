@@ -290,6 +290,32 @@ public class ProjectService {
     }
 
     /**
+     * 根据项目ID获取所有提交记录
+     */
+    public List<ProjectSubmission> getSubmissionsByPracticeId(Integer practiceId) {
+        if (practiceId == null) {
+            throw new RuntimeException("项目ID不能为空");
+        }
+
+        // 验证项目是否存在
+        ProjectPractice project = projectMapper.selectById(practiceId);
+        if (project == null) {
+            throw new RuntimeException("项目不存在");
+        }
+
+        QueryWrapper<ProjectSubmission> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("practice_id", practiceId)
+                .orderByDesc("submit_time");
+        List<ProjectSubmission> submissions = submissionMapper.selectList(queryWrapper);
+        
+        if (submissions == null || submissions.isEmpty()) {
+            return Collections.emptyList();
+        }
+        
+        return submissions;
+    }
+
+    /**
      * 仅选择现有字段，避免访问不存在的 class_id 列
      */
     private Course getCourseById(Integer courseId) {
