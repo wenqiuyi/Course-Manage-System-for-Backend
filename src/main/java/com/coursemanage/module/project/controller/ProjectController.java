@@ -142,6 +142,23 @@ public class ProjectController {
             return ApiResponse.error(e.getMessage());
         }
     }
+
+    /**
+     * 根据项目ID获取所有提交记录
+     * GET /api/project/submissions?practiceId=xxx
+     */
+    @GetMapping("/submissions")
+    public ApiResponse<List<ProjectSubmission>> getSubmissionsByPracticeId(@RequestParam Integer practiceId) {
+        try {
+            if (practiceId == null) {
+                return ApiResponse.error(400, "项目ID不能为空");
+            }
+            List<ProjectSubmission> submissions = projectService.getSubmissionsByPracticeId(practiceId);
+            return ApiResponse.success(submissions);
+        } catch (Exception e) {
+            return ApiResponse.error(e.getMessage());
+        }
+    }
 }
 
 
